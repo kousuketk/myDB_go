@@ -32,7 +32,7 @@ func TestNoSplit(t *testing.T) {
 	assert.True(t, found)
 
 	found, _ = btree.Find(Int64(3))
-	assert.True(t, found)
+	assert.False(t, found)
 }
 
 func TestSplitParent(t *testing.T) {
