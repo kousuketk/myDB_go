@@ -1,0 +1,28 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:latest
+    working_directory: /go/src/github.com/kousuketk/myDB_go
+    steps:
+      - checkout
+      - run: echo 'Hello world!'
+
+  test:
+    docker:
+      - image: circleci/golang:latest
+    working_directory: /go/src/github.com/kousuketk/myDB_go
+    steps:
+      - checkout
+      - run:
+          name: test
+          command: go test test/pkg/btree_test.go -v
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
