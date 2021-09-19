@@ -21,16 +21,19 @@ func main() {
 	}
 	storage := bufpool.NewStorage(home)
 	executor := query.NewExecutor(storage)
-	msg, err := executor.CreateTable()
+	err := executor.CreateTable("sampleTable", "pkey")
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(msg)
-	msg, err = executor.InsertTable()
+	data := []interface{}{
+		"testInsert1",
+		"testInsert2",
+		"testInsert3",
+	}
+	err = executor.InsertTable(data)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(msg)
 	msgs, err := executor.SelectTable()
 	if err != nil {
 		log.Fatal(err)

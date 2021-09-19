@@ -16,15 +16,12 @@ func NewExecutor(storage *bufpool.Storage) *Executor {
 	}
 }
 
-// SeqScan
 func FullScan(store *bufpool.Storage) []*bufpool.Tuple {
 	var result []*bufpool.Tuple
 
 	for i := uint64(0); ; i++ {
-		// t, err := store.ReadTuple(s.tblName, i)
 		t, err := store.ReadTuple("sampleTable", i)
 		if err != nil {
-			// if no more pages, finish reading tuples.
 			break
 		}
 
@@ -37,38 +34,23 @@ func (e *Executor) SelectTable() ([]string, error) {
 	// 直接scannerを呼ぶ(一時的)
 	tuples := FullScan(e.bufpool)
 
-	// cols := []string{"id", "name"}
-
 	var values []string
 	for _, t := range tuples {
-		obj, _ := json.Marshal(t.Data[0])
+		obj, _ := json.Marshal(t)
 		values = append(values, string(obj))
-
-		// for i, c := range cols {
-		// 	obj, _ := json.Marshal(t.Data[i])
-		// 	s := fmt.Sprintf(c, obj)
-		// 	values = append(values, s)
-		// }
 	}
 
 	return values, nil
 }
 
-func (e *Executor) InsertTable() (string, error) {
-	str := []interface{}{
-		"testInsert1",
-		"testInsert2",
-		"testInsert3",
-	}
-	t := bufpool.NewTuple(str)
+func (e *Executor) InsertTable(data []interface{}) error {
+	t := bufpool.NewTuple(data)
 	e.bufpool.InsertTuple("sampleTable", t)
-	e.bufpool.InsertIndex("sampleTable_pkey", t)
-	msg := "A row was inserted"
-	return msg, nil
+	err := e.bufpool.InsertIndex("sampleTable_pkey", t)
+	return err
 }
 
-func (e *Executor) CreateTable() (string, error) {
-	e.bufpool.CreateIndex("sampleTable" + "_" + "pkey")
-	msg := "sampleTable" + " was created as Table"
-	return msg, nil
+func (e *Executor) CreateTable(table string, pkey string) error {
+	_, err := e.bufpool.CreateIndex(table + "_" + pkey)
+	return err
 }
